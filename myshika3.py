@@ -66,7 +66,15 @@ class MyFrame(wx.Frame):
         # マップ上でクリックした位置を取得し、四角形を作成
         rect_x = round(event.xdata)
         rect_y = round(event.ydata)
-        self.rectangle = Rectangle((rect_x, rect_y), 1, 1, edgecolor='blue', facecolor='none')
+        print("CLICK:",rect_x, rect_y)
+
+        #-q: Rectangleの最初の座標は何を示している？
+        #-a: 左下の座標を示している 
+        #-q: 次の、1,1は何を示している？
+        #-a: 幅と高さを示している
+        rec_startx = rect_x - 0.5
+        rec_starty = rect_y - 0.5
+        self.rectangle = Rectangle((rec_startx, rec_starty), 1, 1, edgecolor='blue', facecolor='none')
         self.ax1.add_patch(self.rectangle)
     
         if event.dblclick:
@@ -79,7 +87,6 @@ class MyFrame(wx.Frame):
     
         # キャンバスを再描画
         self.canvas.draw()
-
 
 if __name__ == "__main__":
     app = wx.App()
