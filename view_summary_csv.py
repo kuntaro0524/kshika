@@ -9,16 +9,25 @@ import cv2
 
 matplotlib.use('WXAgg')
 
+import SummaryDat
+
 class MyFrame(wx.Frame):
-    def __init__(self, parent, id, title, csv_path):
+    def __init__(self, parent, id, title, summary_path):
         wx.Frame.__init__(self, parent, id, title)
 
+        # Summary dat
+        sd = SummaryDat.SummaryDat(summary_path)
+
         # CSVファイルを読む
-        self.csv_path = csv_path
-        df = pd.read_csv(self.csv_path)
+        df = sd.makePlotData()
 
         width = df['fast_index'].max()*4 + 1
         height = df['slow_index'].max()*4 + 1
+
+        # グリッドの表示の際のアスペクト比を固定
+        beamh=10.0
+        beamv=20.0
+        self.aspect = beamh/beamv
 
         # ウィンドウサイズを設定（画像のサイズ + マージン）
         super(MyFrame, self).__init__(parent, title=title, size=(width+100, height+100))
@@ -53,7 +62,7 @@ class MyFrame(wx.Frame):
 
         # データの読み込み
         # マップデータ読み込み部分の修正
-        df = pd.read_csv(self.csv_path)
+        df = sd.makePlotData()
         max_x = df['fast_index'].max() + 1
         max_y = df['slow_index'].max() + 1
         self.matrix = np.zeros((max_y, max_x))
@@ -61,6 +70,8 @@ class MyFrame(wx.Frame):
             self.matrix[int(row['slow_index']), int(row['fast_index'])] = row['height']
         
         # マップ表示部分の修正
+        # 縦横のグリッドのアスペクト比を固定
+        # self.ax1.set_aspect(self.aspect)
         self.ax1.imshow(self.matrix, cmap='hot', interpolation='none')
 
         # キーボード入力イベントのリスナーを追加
@@ -70,7 +81,6 @@ class MyFrame(wx.Frame):
         size = self.size_ctrl.GetValue()
         max_num = self.max_ctrl.GetValue()
         wx.MessageBox(f'サイズ: {size}\n最大個数: {max_num}', '情報', wx.OK | wx.ICON_INFORMATION)
-
 
     def on_click(self, event):
         # 前回描画した長方形を削除
@@ -146,7 +156,7 @@ class MyFrame(wx.Frame):
 
 if __name__ == "__main__":
     app = wx.App()
-    csv_file = sys.argv[1]
-    frame = MyFrame(None, -1, 'wxPython Heatmap', csv_file)
+    summary_path = sys.argv[1]
+    frame = MyFrame(None, -1, 'wxPython Heatmap', summary_path)
     frame.Show()
     app.MainLoop()
