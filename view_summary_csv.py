@@ -71,8 +71,8 @@ class MyFrame(wx.Frame):
         
         # マップ表示部分の修正
         # 縦横のグリッドのアスペクト比を固定
-        # self.ax1.set_aspect(self.aspect)
-        self.ax1.imshow(self.matrix, cmap='hot', interpolation='none')
+        # self.ax1.set_aspect(4.0)
+        self.ax1.imshow(self.matrix, cmap='hot', interpolation='none',aspect=2.0)
 
         # キーボード入力イベントのリスナーを追加
         self.Bind(wx.EVT_CHAR_HOOK, self.on_key_event)
