@@ -14,10 +14,13 @@ class ThumNailer(wx.Panel):
 
         self.panel = wx.Panel(self)
         self.image_ctrl = wx.StaticBitmap(self.panel)
+        
+        # 画像表示領域を固定 600x600pixels
+        self.image_ctrl.SetMinSize((IMG_WIDTH, IMG_HEIGHT))
 
         # self.text_box の横幅を固定する
         self.text_box = wx.TextCtrl(self.panel, style=wx.TE_PROCESS_ENTER)
-        self.text_box.SetMinSize((100, -1))
+        self.text_box.SetMinSize((600, -1))
         self.text_box.Bind(wx.EVT_TEXT_ENTER, self.on_enter)
         
         sizer = wx.BoxSizer(wx.VERTICAL)
