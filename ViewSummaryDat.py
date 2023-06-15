@@ -6,14 +6,15 @@ from matplotlib.figure import Figure
 import pandas as pd
 import numpy as np
 import cv2
+from CustomEvent import myEVT_CUSTOM, EVT_CUSTOM, CustomEvent
 
 matplotlib.use('WXAgg')
 
 import SummaryDat
 
-class MyFrame(wx.Frame):
+class ViewSummaryDat(wx.Panel):
     def __init__(self, parent, id, title, summary_path):
-        wx.Frame.__init__(self, parent, id, title)
+        wx.Frame.__init__(self, parent, id)
 
         # Summary dat
         sd = SummaryDat.SummaryDat(summary_path)
@@ -24,13 +25,17 @@ class MyFrame(wx.Frame):
         width = df['fast_index'].max()*4 + 1
         height = df['slow_index'].max()*4 + 1
 
+        # width/height
+        self.width_max = df['fast_index'].max()
+        self.height_max = df['slow_index'].max()
+
         # グリッドの表示の際のアスペクト比を固定
         beamh=10.0
         beamv=20.0
         self.aspect = beamv/beamh
 
         # ウィンドウサイズを設定（画像のサイズ + マージン）
-        super(MyFrame, self).__init__(parent, title=title, size=(width+100, height+100))
+        super(ViewSummaryDat, self).__init__(parent, size=(width+100, height+100))
         
         self.panel = wx.Panel(self)
         self.fig = Figure()
@@ -107,9 +112,13 @@ class MyFrame(wx.Frame):
         if event.dblclick:
             # wx.MessageBox(f'X座標: {rect_x}\nY座標: {rect_y}\nダブルクリック！', '情報', wx.OK | wx.ICON_INFORMATION)
             print(f'X座標: {rect_x} Y座標: {rect_y} ダブルクリック！', '情報', wx.OK | wx.ICON_INFORMATION)
+            # through index 
+            t_index = rect_y * self.width_max + rect_x
+            # カスタムイベントの定義
+            evt = CustomEvent(myEVT_CUSTOM, -1, (rect_x, rect_y, t_index))
+
+            self.GetEventHandler().ProcessEvent(evt)
         
-            # 外部スクリプトを実行
-            subprocess.run('/Applications/ccp4-8.0/bin/coot')
         else:
             # wx.MessageBox(f'X座標: {rect_x}\nY座標: {rect_y}\nheight: {height}', '情報', wx.OK | wx.ICON_INFORMATION)
             print(f'X座標: {rect_x} Y座標: {rect_y} single click！', '情報', wx.OK | wx.ICON_INFORMATION)
