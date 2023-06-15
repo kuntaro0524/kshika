@@ -31,7 +31,7 @@ class ViewSummaryDat(wx.Panel):
 
         # グリッドの表示の際のアスペクト比を固定
         beamh=10.0
-        beamv=20.0
+        beamv=15.0
         self.aspect = beamv/beamh
 
         # ウィンドウサイズを設定（画像のサイズ + マージン）
@@ -116,7 +116,6 @@ class ViewSummaryDat(wx.Panel):
             t_index = rect_y * self.width_max + rect_x
             # カスタムイベントの定義
             evt = CustomEvent(myEVT_CUSTOM, -1, (rect_x, rect_y, t_index))
-
             self.GetEventHandler().ProcessEvent(evt)
         
         else:
@@ -156,6 +155,12 @@ class ViewSummaryDat(wx.Panel):
             height = self.matrix[rect_y, x]
             # wx.MessageBox(f'X座標: {x}\nY座標: {y}\nheight: {height}', '情報', wx.OK | wx.ICON_INFORMATION)
             print(f'X座標: {x}\nY座標: {y}\nheight: {height}', '情報', wx.OK | wx.ICON_INFORMATION)
+
+            # through index 
+            t_index = y * self.width_max + x
+            # カスタムイベントの定義
+            evt = CustomEvent(myEVT_CUSTOM, -1, (x, y, t_index))
+            self.GetEventHandler().ProcessEvent(evt)
 
             # キャンバスを再描画
             self.canvas.draw()

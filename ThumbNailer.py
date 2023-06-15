@@ -27,6 +27,7 @@ class ThumNailer(wx.Panel):
         sizer.Add(self.image_ctrl, 1, wx.EXPAND)
         sizer.Add(self.text_box, 0, wx.ALIGN_CENTER | wx.TOP | wx.BOTTOM, 10)
         self.panel.SetSizerAndFit(sizer)
+        self.isPrep=False
 
     def update_with_coordinates(self, coordinates):
         print("CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC",coordinates)
@@ -35,35 +36,43 @@ class ThumNailer(wx.Panel):
         self.changeState(t_index)
 
     def changeState(self, number):
-        filename = self.find_file(number)
-        if filename is not None:
-            img = cv2.imread(os.path.join(IMG_FOLDER, filename))
-            img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)  # Convert to RGB for wx.BitmapFromBuffer
-            tile_num = (number - 1) % 100  # index within the tile
-            row, col = divmod(tile_num, 10)
-            start_y = row * IMG_HEIGHT
-            start_x = col * IMG_WIDTH
-            print(start_x, start_y)
-            tile = img[start_y:start_y + IMG_HEIGHT, start_x:start_x + IMG_WIDTH]
-            print(tile.shape)
-            self.display_image(tile)
-        else:
-            wx.MessageBox('Image number out of range.', 'Error', wx.OK | wx.ICON_ERROR)
+        img = self.find_file(number)
+        img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)  # Convert to RGB for wx.BitmapFromBuffer
+        tile_num = (number - 1) % 100  # index within the tile
+        row, col = divmod(tile_num, 10)
+        start_y = row * IMG_HEIGHT
+        start_x = col * IMG_WIDTH
+        print(start_x, start_y)
+        tile = img[start_y:start_y + IMG_HEIGHT, start_x:start_x + IMG_WIDTH]
+        print(tile.shape)
+        self.display_image(tile)
     
     def on_enter(self, event):
         num = int(self.text_box.GetValue())
-    
-    def find_file(self, num):
-        for filename in os.listdir(IMG_FOLDER):
-            print(filename)
-            if filename.endswith('.jpg'):
-                start, end = map(int, filename.split('.')[0].split('_')[1].split('-'))
-                print(start,end)
-                if start <= num <= end:
-                    print("found!: ", filename)
-                    return filename
-        return None
+        self.changeState(num)
 
+    def openAllImages(self):
+        # file_dics
+        self.file_dics={}
+        # filename 
+        for filename in os.listdir(IMG_FOLDER):
+            if filename.endswith('.jpg'):
+                img=cv2.imread(os.path.join(IMG_FOLDER, filename))
+                self.file_dics[filename]=img
+            
+        self.isPrep=True
+        return self.file_dics
+
+    def find_file(self, num):
+        if self.isPrep==False:
+            self.openAllImages()
+        # self.file_dicsの中から該当するファイル名のものを探す
+        # self.file_dicsのファイル名、ファイルオブジェクトでforループを回す
+        for filename, fileobj in self.file_dics.items():
+            start, end = map(int, filename.split('.')[0].split('_')[1].split('-'))
+            if start <= num <= end:
+                return fileobj
+    
     def display_image(self, img):
         h, w, _ = img.shape
         img_flat = img.flatten()
