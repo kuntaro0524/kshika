@@ -74,7 +74,7 @@ class H5proc:
             if not self.h5["/entry/data"].get(k): continue
             image_nr_low = self.h5["/entry/data"][k].attrs["image_nr_low"]
             image_nr_high = self.h5["/entry/data"][k].attrs["image_nr_high"]
-            print(image_nr_high, image_nr_low)
+            print("TTESTTST:",image_nr_high, image_nr_low)
 
     def peakSearch(self, data):
         from scipy import ndimage
@@ -118,9 +118,10 @@ data = h5m.extract_data(sys.argv[1],1)
 # ピクセルの平均値を取得し、その３倍以上の値を持つピクセルを抜き出す
 # その座標を表示する
 mean = np.mean(data)
+print("mean: ", mean)
 
 # thresholdはmeanの３倍
-threshold = mean * 3
+threshold = mean * 5
 print("threshold: ", threshold)
 
 # dataのなかで数値がthresholdより大きいものを抜き出す
